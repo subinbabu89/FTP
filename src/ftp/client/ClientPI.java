@@ -9,42 +9,42 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import ftp.utility.Constants;
-
 /**
  * @author Sahana Ravikumar
  *
  */
-
-public class Client {
+public class ClientPI {
 
 	private static Socket clientSocket;
-
 	private static DataOutputStream dataoutputstream = null;
-
 	private static DataInputStream datainputstream = null;
 
-	public static void main(String[] args) {
-		
-		try {
-			clientSocket = new Socket(Constants.SERVER_IP_ADDRESS, Constants.SERVER_PORT);
+	private String server_ip;
+	private int server_port;
 
-			datainputstream = new DataInputStream(clientSocket.getInputStream());
-			dataoutputstream = new DataOutputStream(clientSocket.getOutputStream());
+	public ClientPI(String server_ip, int server_port) {
+		this.server_ip = server_ip;
+		this.server_port = server_port;
+	}
 
-			System.out.println("Client saying hello");
-			dataoutputstream.writeUTF("hello");
+	public void openConnection() throws UnknownHostException, IOException {
+		clientSocket = new Socket(server_ip, server_port);
+		datainputstream = new DataInputStream(clientSocket.getInputStream());
+		dataoutputstream = new DataOutputStream(clientSocket.getOutputStream());
+	}
 
-			System.out.println("Client waiting...");
-			String responseFromServer = datainputstream.readUTF();
-			System.out.println("The server response is " + responseFromServer);
+	public void sendClientRequest() throws IOException {
+		System.out.println("Client saying hello");
+		dataoutputstream.writeUTF("hello");
+	}
 
-			clientSocket.close();
+	public void receiveServerResponse() throws IOException {
+		System.out.println("Client waiting...");
+		String responseFromServer = datainputstream.readUTF();
+		System.out.println("The server response is " + responseFromServer);
+	}
 
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void closeConnection() throws IOException {
+		clientSocket.close();
 	}
 }

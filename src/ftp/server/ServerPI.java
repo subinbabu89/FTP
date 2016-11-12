@@ -8,50 +8,59 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
-import ftp.utility.Constants;
+import java.net.UnknownHostException;
 
 /**
  * @author Sahana Ravikumar
  *
  */
-
-public class Server {
+public class ServerPI {
 
 	private static ServerSocket serverSocket;
-
 	private static DataOutputStream dataoutputstream = null;
-
 	private static DataInputStream datainputstream = null;
 
-	public static void main(String[] args) {
+	private int server_port;
 
-		try {
-			serverSocket = new ServerSocket(Constants.SERVER_PORT);
+	public ServerPI(int serverPort) {
+		this.server_port = serverPort;
+	}
 
-			while (true) {
+	public void openConnection() throws UnknownHostException, IOException {
+		serverSocket = new ServerSocket(server_port);
+	}
 
-				Socket requestSocket = serverSocket.accept();
+	public void manageRequestResponse() throws IOException {
+		while (true) {
 
-				datainputstream = new DataInputStream(requestSocket.getInputStream());
-				dataoutputstream = new DataOutputStream(requestSocket.getOutputStream());
+			Socket requestSocket = serverSocket.accept();
 
-				System.out.println("Reading...");
-				String sentence = datainputstream.readUTF();
-				System.out.println("The sentence read in server is " + sentence);
+			acceptClientRequest(requestSocket);
 
-				dataoutputstream.writeUTF(sentence);
+			sendServerResponse(requestSocket);
 
-				requestSocket.close();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				serverSocket.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			closeRequestSocket(requestSocket);
 		}
+	}
+
+	public void acceptClientRequest(Socket clientSocket) throws IOException {
+		datainputstream = new DataInputStream(clientSocket.getInputStream());
+		System.out.println("Reading...");
+		String sentence = datainputstream.readUTF();
+		System.out.println("The sentence read in server is " + sentence);
+	}
+
+	public void sendServerResponse(Socket clientSocket) throws IOException {
+		dataoutputstream = new DataOutputStream(clientSocket.getOutputStream());
+		String response = "Hello from Server!!";
+		dataoutputstream.writeUTF(response);
+	}
+
+	public void closeRequestSocket(Socket clientSocket) throws IOException {
+		clientSocket.close();
+	}
+
+	public void closeConnection() throws IOException {
+		serverSocket.close();
 	}
 }
