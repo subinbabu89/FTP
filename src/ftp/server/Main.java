@@ -7,15 +7,11 @@ import java.io.IOException;
 
 import ftp.utility.Constants;
 
-/**
- * @author Sahana Ravikumar
- *
- */
 public class Main {
 
 	public static void main(String[] args) {
 
-		ServerPI serverPI = new ServerPI(Constants.SERVER_PORT);
+		ServerPI serverPI = new ServerPI(Constants.SERVER_CONTROL_PORT);
 		
 		try {
 			serverPI.openConnection();

@@ -9,18 +9,20 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.StringTokenizer;
 
-/**
- * @author Sahana Ravikumar
- *
- */
+import ftp.commands.PASV;
+import ftp.commands.PORTCommand;
+import ftp.connections.ServerDTP;
+
 public class ServerPI {
 
 	private static ServerSocket serverSocket;
 	private static DataOutputStream dataoutputstream = null;
 	private static DataInputStream datainputstream = null;
 
-	private int server_port;
+	private int server_port;	
+	private int server_data_port;
 
 	public ServerPI(int serverPort) {
 		this.server_port = serverPort;
@@ -39,21 +41,45 @@ public class ServerPI {
 
 			sendServerResponse(requestSocket);
 
-			closeRequestSocket(requestSocket);
+			//closeRequestSocket(requestSocket); //figure out later
 		}
 	}
 
 	public void acceptClientRequest(Socket clientSocket) throws IOException {
+		String ipaddr = null;
+		int data_port = 0;
+		
 		datainputstream = new DataInputStream(clientSocket.getInputStream());
 		System.out.println("Reading...");
-		String sentence = datainputstream.readUTF();
-		System.out.println("The sentence read in server is " + sentence);
+		String command = datainputstream.readUTF();
+		System.out.println("The command read in server is " + command);
+		
+		if(command.equals("PASV")){
+			PASV pasvObject  = new PASV();
+			server_data_port = pasvObject.getPort();
+			System.out.println("The port on which the server is listening for data connection : " + server_data_port);
+		}else if(command.contains("PORT")){
+			System.out.println("in port cmd");
+			StringTokenizer tokens = new StringTokenizer(command, " ");
+			System.out.println("The tokens are " + tokens.nextToken());
+			
+			while(tokens.hasMoreTokens()){
+				ipaddr = tokens.nextToken();
+				data_port = Integer.parseInt(tokens.nextToken());
+			}
+			
+			/*ServerDTP serverdtp_object = new ServerDTP(ipaddr, data_port);
+			serverdtp_object.openDataConnection();
+			*/
+			//PORTCommand portObject = new PORTCommand(tokens.nextToken().);
+			
+		}
 	}
 
 	public void sendServerResponse(Socket clientSocket) throws IOException {
 		dataoutputstream = new DataOutputStream(clientSocket.getOutputStream());
-		String response = "Hello from Server!!";
-		dataoutputstream.writeUTF(response);
+		
+		dataoutputstream.writeUTF(Integer.toString(server_data_port));
 	}
 
 	public void closeRequestSocket(Socket clientSocket) throws IOException {
