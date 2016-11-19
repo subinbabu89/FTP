@@ -21,7 +21,7 @@ public class ClientPI {
 
 	private String server_ip;
 	private int server_port;
-
+//
 	public ClientPI(String server_ip, int server_port) {
 		this.server_ip = server_ip;
 		this.server_port = server_port;
