@@ -15,8 +15,6 @@ public class Main {
 		
 		ClientPI clientPI = new ClientPI(Constants.SERVER_IP_ADDRESS, Constants.SERVER_CONTROL_PORT);
 		
-		ClientPI clientPI1 = new ClientPI(Constants.SERVER_IP_ADDRESS, Constants.SERVER_CONTROL_PORT);
-		
 		try {
 			clientPI.openConnection();
 
@@ -26,16 +24,13 @@ public class Main {
 			
 			System.out.println("Main : " + serverDataPort);
 			
-			clientPI.closeConnection();
-			
-			clientPI1.openConnection();
-			
-			clientPI1.sendClientRequest("PORT " + Constants.SERVER_IP_ADDRESS + " " + serverDataPort);
+			clientPI.sendClientRequest("PORT " + Constants.SERVER_IP_ADDRESS + " " + serverDataPort);
 
-			clientPI1.receiveServerResponse();
+			clientPI.receiveServerResponse();
 			
-			clientPI1.closeConnection();
+			clientPI.sendClientRequest("QUIT");
 			
+			//clientPI.closeConnection();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

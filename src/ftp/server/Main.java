@@ -16,9 +16,12 @@ public class Main {
 		try {
 			serverPI.openConnection();
 
+			/*Thread t = new Thread(serverPI);
+			t.start();*/
+			
 			serverPI.manageRequestResponse();
 
-			serverPI.closeConnection();
+			//serverPI.closeConnection();
 			
 		} catch (IOException e) {
 			e.printStackTrace();

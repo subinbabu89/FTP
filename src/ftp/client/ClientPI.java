@@ -12,9 +12,9 @@ import java.net.UnknownHostException;
 
 public class ClientPI {
 
-	private static Socket clientSocket;
-	private static DataOutputStream dataoutputstream = null;
-	private static DataInputStream datainputstream = null;
+	private Socket clientSocket;
+	private DataOutputStream dataoutputstream = null;
+	private DataInputStream datainputstream = null;
 
 	private String server_ip;
 	private int server_port;
@@ -39,6 +39,7 @@ public class ClientPI {
 		System.out.println("Client waiting...");
 		
 		int responseFromServer = Integer.parseInt(datainputstream.readUTF());
+		
 		System.out.println("The server response is " + responseFromServer);
 		return responseFromServer;
 	}
