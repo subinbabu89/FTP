@@ -14,6 +14,7 @@ public class Server {
 			serverSocket = new ServerSocket(21);
 
 			while (true) {
+				System.out.println("Server listening on port 21");
 				Socket request_socket = serverSocket.accept();
 				Runnable controlConnection = new ControlConnection(request_socket);
 				new Thread(controlConnection).start();

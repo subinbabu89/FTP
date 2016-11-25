@@ -23,10 +23,12 @@ public class DataConnection implements Runnable {
 	public void run() {
 
 		System.out.println("In run method");
-		if (command.equals("stor"))
-			uploadFile("sample.txt");
-		else if (command.equals("retr"))
-			downloadFile("sampleFile.txt");
+		if (command.equals("STOR"))
+			System.out.println("In server save file");
+			//uploadFile("sample.txt");
+		else if (command.equals("RETR"))
+			System.out.println("In server send file");
+			//downloadFile("sampleFile.txt");
 	}
 
 	private void uploadFile(String fileName) {
@@ -68,6 +70,19 @@ public class DataConnection implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void savefile() {
+		/*
+		 * InputStream in = null; OutputStream out = null;
+		 * 
+		 * try { in = request_socket.getInputStream(); out = new
+		 * FileOutputStream("D:/SAHANA/ab.txt"); byte[] bytes = new
+		 * byte[16*1024];
+		 * 
+		 * int count; while ((count = in.read(bytes)) > 0) { out.write(bytes, 0,
+		 * count); } } catch (IOException e) { e.printStackTrace(); }
+		 */
 	}
 
 }
