@@ -46,6 +46,9 @@ public class Client {
 
 			System.out.println("The data port received at the client side is " + data_port);
 
+			dataoutputstream.writeUTF("PORT " + hostName + " " + data_port);
+			System.out.println("PORT command completed\n");
+			
 			System.out.println("Enter the command: ");
 			String command = scanner.nextLine();
 			

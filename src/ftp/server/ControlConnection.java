@@ -38,7 +38,9 @@ public class ControlConnection implements Runnable {
 
 				if(command.equals("PASV"))
 					cmd = "PASV";
-				else if (command.contains("STOR")) {
+				else if(command.contains("PORT")){
+					cmd = "PORT";
+				}else if (command.contains("STOR")) {
 					System.out.println("stor received");
 					cmd = "STOR";
 				} else if (command.contains("USER")) {
@@ -53,11 +55,14 @@ public class ControlConnection implements Runnable {
 					data_port = generateDataPort();
 					System.out.println("The data port is " + data_port);
 					dataoutputstream.writeUTF(String.valueOf(data_port));
+					break;
+
+				case "PORT":
 					ServerSocket serverSocket = new ServerSocket(data_port);
 					System.out.println("Server listening on port " + data_port);
 					requ_socket = serverSocket.accept();
 					break;
-
+					
 				case "USER":
 					String username = checkUser(command);
 					listFiles(username);
