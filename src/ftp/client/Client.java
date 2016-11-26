@@ -1,5 +1,6 @@
 package ftp.client;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -9,6 +10,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class Client {
@@ -16,11 +19,11 @@ public class Client {
 	private static Socket clientSocket;
 
 	public static void main(String[] args) {
-
 		DataOutputStream dataoutputstream = null;
 		DataInputStream datainputstream = null;
 
 		try {
+			
 			Scanner scanner = new Scanner(System.in);
 
 			System.out.println("Enter the host to connect: ");
@@ -37,30 +40,44 @@ public class Client {
 			datainputstream = new DataInputStream(clientSocket.getInputStream());
 			dataoutputstream = new DataOutputStream(clientSocket.getOutputStream());
 
-			dataoutputstream.writeUTF("USER " + username);
+			while(true){
+				System.out.println("[ MENU ]");
+				System.out.println("1. Upload File");
+				System.out.println("2. Download File");
+				System.out.println("3. Quit");
+				System.out.print("\nEnter Choice :");
+				int choice;
+				
+				choice = Integer.parseInt(scanner.nextLine());
+				
+				if(choice == 3){
+					System.out.println("Disconnected...");
+					dataoutputstream.writeUTF("QUIT");
+					disconnectClient();
+				}
+				
+				dataoutputstream.writeUTF("USER " + username);
 
-			dataoutputstream.writeUTF("PASV");
+				dataoutputstream.writeUTF("PASV");
 
-			int data_port = Integer.parseInt(datainputstream.readUTF());
+				int data_port = Integer.parseInt(datainputstream.readUTF());
 
-			System.out.println("The data port received at the client side is " + data_port);
-
-			// dataoutputstream.writeUTF("PORT " + hostName + " " + data_port);
-			// System.out.println("PORT command completed\n");
-
-			System.out.println("Enter the command: ");
-			String command = scanner.nextLine();
-
-			if (command.contains("STOR")) {
-				dataoutputstream.writeUTF("STOR");
-				sendFile(host, data_port, command);
-			} else if (command.contains("RETR")) {
-				dataoutputstream.writeUTF("RETR");
-				receiveFile(host, data_port, command);
+				System.out.println("The data port received at the client side is " + data_port);
+				
+				System.out.println("Enter the filename or filepath: ");
+				String filePath = scanner.nextLine();
+				
+				String fileName = getFileName(filePath);
+				System.out.println("The filename is " + fileName);
+				
+				if(choice==1){
+					dataoutputstream.writeUTF("STOR");
+					sendFile(host, data_port, filePath);
+				}else if(choice==2){
+					dataoutputstream.writeUTF("RETR");
+					receiveFile(host, data_port, filePath);
+				}
 			}
-
-			dataoutputstream.writeUTF("QUIT");
-
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -74,10 +91,18 @@ public class Client {
 		}
 	}
 
-	private static void sendFile(InetAddress host, int data_port, String command) {
-		// create a socket
-		// send the file
+	private static String getFileName(String filePath) {
+		filePath = filePath.replaceAll("/", "\\\\");
+		Path p = Paths.get(filePath);
+		String fileName = p.getFileName().toString();
+		return fileName;
+	}
 
+	private static void disconnectClient() {
+		System.exit(1);
+	}
+
+	private static void sendFile(InetAddress host, int data_port, String filePath) {
 		System.out.println("In client upload file");
 
 		try {
@@ -106,9 +131,7 @@ public class Client {
 		}
 	}
 
-	private static void receiveFile(InetAddress host, int data_port, String command) {
-		// create a socket
-		// Receive the file
+	private static void receiveFile(InetAddress host, int data_port, String filePath) {
 		System.out.println("In client download file");
 
 		try {
