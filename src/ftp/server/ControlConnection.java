@@ -23,8 +23,9 @@ public class ControlConnection implements Runnable {
 	@Override
 	public void run() {
 		int data_port = 0;
-		Socket requ_socket=null;
-		
+		Socket requ_socket = null;
+		String username = null;
+
 		try {
 			while (true) {
 
@@ -33,59 +34,66 @@ public class ControlConnection implements Runnable {
 
 				String command = datainputstream.readUTF();
 				String cmd = null;
-				
+
 				System.out.println("the cmd read is " + command);
 
-				if(command.equals("PASV"))
+				if (command.equals("PASV"))
 					cmd = "PASV";
-				else if(command.contains("PORT")){
-					cmd = "PORT";
-				}else if (command.contains("STOR")) {
+				/*
+				 * else if(command.contains("PORT")){ cmd = "PORT"; }
+				 */else if (command.contains("STOR")) {
 					System.out.println("stor received");
 					cmd = "STOR";
+				} else if (command.contains("RETR")) {
+					System.out.println("retr received");
+					cmd = "RETR";
 				} else if (command.contains("USER")) {
 					System.out.println("USER cmd received");
 					cmd = "USER";
-				}else if(command.equals("QUIT"))
+				} else if (command.equals("QUIT"))
 					cmd = "QUIT";
-				
+
 				switch (cmd) {
 
 				case "PASV":
 					data_port = generateDataPort();
 					System.out.println("The data port is " + data_port);
 					dataoutputstream.writeUTF(String.valueOf(data_port));
-					break;
-
-				case "PORT":
 					ServerSocket serverSocket = new ServerSocket(data_port);
 					System.out.println("Server listening on port " + data_port);
 					requ_socket = serverSocket.accept();
 					break;
-					
+
+				/*
+				 * case "PORT": ServerSocket serverSocket = new
+				 * ServerSocket(data_port); System.out.println(
+				 * "Server listening on port " + data_port); requ_socket =
+				 * serverSocket.accept(); break;
+				 */
+
 				case "USER":
-					String username = checkUser(command);
+					username = checkUser(command);
 					listFiles(username);
 					break;
 
 				case "STOR": {
 					System.out.println("In store");
-					Runnable dataConnection = new DataConnection(requ_socket, "store");
+					Runnable dataConnection = new DataConnection(username, command, requ_socket);
 					new Thread(dataConnection).start();
 					break;
 				}
 
 				case "RETR": {
-					System.out.println("In store");
-					Runnable dataConnection = new DataConnection(requ_socket, "retr");
+					System.out.println("In retrieve");
+					Runnable dataConnection = new DataConnection(username, command, requ_socket);
 					new Thread(dataConnection).start();
 					break;
 				}
 
 				case "QUIT": {
-						System.out.println("quit command received");
-						return;
-					}
+					System.out.println("quit command received");
+					return;
+				}
 				}
 			}
 		} catch (IOException e) {
@@ -120,7 +128,7 @@ public class ControlConnection implements Runnable {
 		File folder = new File(filePath);
 		File[] listOfFiles = folder.listFiles();
 
-		if(listOfFiles.length > 0)
+		if (listOfFiles.length > 0)
 			System.out.println("The files present are");
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
