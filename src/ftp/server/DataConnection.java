@@ -35,20 +35,18 @@ public class DataConnection implements Runnable {
 		}
 	}
 
-	private String getFileName(String command2) {
-		StringTokenizer tokens = new StringTokenizer(command, " ");
-		tokens.nextToken();
-		return tokens.nextToken();
-	}
-
 	private void receiveFile() {
 		DataInputStream din;
 
 		try {
 			din = new DataInputStream(req_socket.getInputStream());
-			String filename = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/server/sampleServer.txt";
-
-			File f = new File(filename);
+			
+			String fname = din.readUTF();
+			
+			//String filename = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/server/sampleServer.txt";
+			String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + username + "/" + fname;
+			
+			File f = new File(filePath);
 
 			FileOutputStream fout = new FileOutputStream(f);
 			int ch;

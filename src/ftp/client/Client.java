@@ -62,20 +62,21 @@ public class Client {
 
 				int data_port = Integer.parseInt(datainputstream.readUTF());
 
-				System.out.println("The data port received at the client side is " + data_port);
-				
-				System.out.println("Enter the filename or filepath: ");
-				String filePath = scanner.nextLine();
-				
-				String fileName = getFileName(filePath);
-				System.out.println("The filename is " + fileName);
-				
-				if(choice==1){
+				if(choice == 1){
+					System.out.println("Enter the filepath: ");
+					String filePath = scanner.nextLine();
+					
 					dataoutputstream.writeUTF("STOR");
+					
 					sendFile(host, data_port, filePath);
-				}else if(choice==2){
+					
+				}else if(choice == 2){
+					System.out.println("Enter the filename: ");
+					String fileName = scanner.nextLine();
+					
 					dataoutputstream.writeUTF("RETR");
-					receiveFile(host, data_port, filePath);
+					
+					receiveFile(host, data_port, fileName);
 				}
 			}
 		} catch (UnknownHostException e) {
@@ -92,6 +93,7 @@ public class Client {
 	}
 
 	private static String getFileName(String filePath) {
+		filePath = filePath.replace("\\", "/");
 		filePath = filePath.replaceAll("/", "\\\\");
 		Path p = Paths.get(filePath);
 		String fileName = p.getFileName().toString();
@@ -103,17 +105,18 @@ public class Client {
 	}
 
 	private static void sendFile(InetAddress host, int data_port, String filePath) {
-		System.out.println("In client upload file");
-
 		try {
 			Socket dataSocket = new Socket(host, data_port);
 			System.out.println("Connected to " + dataSocket.getRemoteSocketAddress() + " for Data Connection");
-			System.out.println("client : In send file");
 
 			DataOutputStream dout = new DataOutputStream(dataSocket.getOutputStream());
-			String filename = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/client/sample.txt";
-			File f = new File(filename);
+			filePath = filePath.replace("\\", "/");
+			
+			File f = new File(filePath);
 
+			String fileName = getFileName(filePath);
+			dout.writeUTF(fileName);
+			
 			System.out.println("Sending File ...");
 
 			FileInputStream fin = new FileInputStream(f);
@@ -131,17 +134,18 @@ public class Client {
 		}
 	}
 
-	private static void receiveFile(InetAddress host, int data_port, String filePath) {
-		System.out.println("In client download file");
+	private static void receiveFile(InetAddress host, int data_port, String fileName) {
 
 		try {
 			Socket dataSocket = new Socket(host, data_port);
 			System.out.println("Connected to " + dataSocket.getRemoteSocketAddress() + " for Data Connection");
 
-			String fileName = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/client/sample_inclient.txt";
+			String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + fileName;
+			//String fileName = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/client/sample_inclient.txt";
 
 			File f = new File(fileName);
 			DataInputStream din = new DataInputStream(dataSocket.getInputStream());
+
 			FileOutputStream fout = new FileOutputStream(f);
 			int ch;
 			String temp;
