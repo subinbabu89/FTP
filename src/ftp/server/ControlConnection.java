@@ -111,6 +111,7 @@ public class ControlConnection implements Runnable {
 		StringTokenizer tokens = new StringTokenizer(command, " ");
 		tokens.nextToken();
 		String username = tokens.nextToken();
+		String userPath = "/home/ec2-user/" + username;
 		File file = new File(username);
 		if (!file.exists()) {
 			if (file.mkdir()) {

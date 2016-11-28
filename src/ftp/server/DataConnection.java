@@ -8,6 +8,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.StringTokenizer;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DataConnection implements Runnable {
 
@@ -15,7 +17,8 @@ public class DataConnection implements Runnable {
 	private String command;
 	private Socket req_socket;
 	private String username;
-
+	private static ReadWriteLock lock = new ReentrantReadWriteLock();
+	
 	public DataConnection(String username, String command, Socket req_socket) {
 		this.req_socket = req_socket;
 		this.command = command;
@@ -36,6 +39,7 @@ public class DataConnection implements Runnable {
 	}
 
 	private void receiveFile() {
+		
 		DataInputStream din;
 
 		try {
@@ -44,11 +48,14 @@ public class DataConnection implements Runnable {
 			String fname = din.readUTF();
 			
 			//String filename = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/server/sampleServer.txt";
-			String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + username + "/" + fname;
+			String filePath = "/home/ec2-user/" + username + "/" + fname;
 			
 			File f = new File(filePath);
 
 			FileOutputStream fout = new FileOutputStream(f);
+			
+			//lock.writeLock().lock();
+			
 			int ch;
 			String temp;
 			do {
@@ -59,6 +66,9 @@ public class DataConnection implements Runnable {
 				}
 			} while (ch != -1);
 			fout.close();
+			
+			//lock.writeLock().unlock();
+			
 			System.out.println("server: file received successfully");
 
 		} catch (IOException e) {
@@ -73,20 +83,26 @@ public class DataConnection implements Runnable {
 			dout = new DataOutputStream(req_socket.getOutputStream());
 
 			String filename = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/server/download_server.txt";
+			//String filename = "/home/ec2-user/" + username + 
+					
 			File f = new File(filename);
 			FileInputStream fin = new FileInputStream(f);
+			
+			//lock.readLock().lock();
+			
 			int ch;
 			do {
 				ch = fin.read();
 				dout.writeUTF(String.valueOf(ch));
 			} while (ch != -1);
 			fin.close();
+			
+			//lock.readLock().lock();
+			
 			System.out.println("Server: File Sending done");
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		;
-
 	}
 }

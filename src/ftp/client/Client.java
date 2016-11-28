@@ -33,6 +33,8 @@ public class Client {
 			String username = scanner.nextLine();
 
 			InetAddress host = InetAddress.getByName(hostName);
+			//String host = "ec2-54-214-92-142.us-west-2.compute.amazonaws.com";
+			//String host = "54.214.92.142";
 			clientSocket = new Socket(host, 21);
 
 			System.out.println("Connected to " + clientSocket.getRemoteSocketAddress() + " for Control Connection");
