@@ -47,7 +47,7 @@ public class DataConnection implements Runnable {
 			
 			String fname = din.readUTF();
 			
-			//String filename = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/server/sampleServer.txt";
+			//String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/server/sampleServer.txt";
 			String filePath = "/home/ec2-user/" + username + "/" + fname;
 			
 			File f = new File(filePath);

@@ -23,7 +23,7 @@ public class Server {
 				System.out.println("Telnet server listening on port 23");
 				Socket telnetClientSocket = telnetSocket.accept();
 				
-				Runnable controlConnection = new ControlConnection(request_socket);
+				Runnable controlConnection = new ControlConnection(request_socket, telnetClientSocket);
 				new Thread(controlConnection).start();
 			}
 		} catch (IOException e) {

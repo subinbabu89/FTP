@@ -24,6 +24,9 @@ public class Client {
 	public static void main(String[] args) {
 		DataOutputStream dataoutputstream = null;
 		DataInputStream datainputstream = null;
+		
+		DataOutputStream telnet_dout = null;
+		DataInputStream telnet_din = null;
 
 		try {
 			
@@ -34,7 +37,7 @@ public class Client {
 
 			System.out.println("Enter the username: ");
 			String username = scanner.nextLine();
-
+			
 			InetAddress host = InetAddress.getByName(hostName);
 			//String host = "ec2-54-214-92-142.us-west-2.compute.amazonaws.com";
 			//String host = "54.214.92.142";
@@ -46,6 +49,23 @@ public class Client {
 			
 			System.out.println("Connected to " + telnetClientSocket.getRemoteSocketAddress() + " for telnet Connection");
 
+			telnet_din = new DataInputStream(telnetClientSocket.getInputStream());
+			telnet_dout = new DataOutputStream(telnetClientSocket.getOutputStream());
+			
+			String success = "false";
+			String password = null;
+			
+			while(success.equals("false")){
+				System.out.println("Enter the password: ");
+				password = scanner.nextLine();
+				
+				String telnet_user_string = "telnetd_" + username + "_" + password;
+				System.out.println("Client: The user string is " + telnet_user_string);
+				telnet_dout.writeUTF(telnet_user_string);
+				
+				success = telnet_din.readUTF();
+			}
+			
 			datainputstream = new DataInputStream(clientSocket.getInputStream());
 			dataoutputstream = new DataOutputStream(clientSocket.getOutputStream());
 
@@ -65,6 +85,12 @@ public class Client {
 					disconnectClient();
 				}
 				
+				dataoutputstream.writeUTF("MODE");
+				System.out.println("The MODE message from server is " + datainputstream.readUTF());
+				
+				dataoutputstream.writeUTF("TYPE");
+				System.out.println("The TYPE message from server is " + datainputstream.readUTF());
+
 				dataoutputstream.writeUTF("USER " + username);
 
 				createUserDirectory(username);
@@ -73,7 +99,11 @@ public class Client {
 
 				int data_port = Integer.parseInt(datainputstream.readUTF());
 
+				System.out.println("data port is " + data_port );
+				System.out.println("The choice made is " + choice);
+				
 				if(choice == 1){
+					System.out.println("In choice 1");
 					System.out.println("Enter the filepath: ");
 					String filePath = scanner.nextLine();
 					
