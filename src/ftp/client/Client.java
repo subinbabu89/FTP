@@ -18,6 +18,8 @@ import java.util.StringTokenizer;
 public class Client {
 
 	private static Socket clientSocket;
+	
+	private static Socket telnetClientSocket;
 
 	public static void main(String[] args) {
 		DataOutputStream dataoutputstream = null;
@@ -39,6 +41,10 @@ public class Client {
 			clientSocket = new Socket(host, 21);
 
 			System.out.println("Connected to " + clientSocket.getRemoteSocketAddress() + " for Control Connection");
+			
+			telnetClientSocket = new Socket(host, 23);
+			
+			System.out.println("Connected to " + telnetClientSocket.getRemoteSocketAddress() + " for telnet Connection");
 
 			datainputstream = new DataInputStream(clientSocket.getInputStream());
 			dataoutputstream = new DataOutputStream(clientSocket.getOutputStream());
