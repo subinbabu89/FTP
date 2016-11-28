@@ -13,6 +13,7 @@ import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class Client {
 
@@ -60,6 +61,8 @@ public class Client {
 				
 				dataoutputstream.writeUTF("USER " + username);
 
+				createUserDirectory(username);
+				
 				dataoutputstream.writeUTF("PASV");
 
 				int data_port = Integer.parseInt(datainputstream.readUTF());
@@ -78,7 +81,7 @@ public class Client {
 					
 					dataoutputstream.writeUTF("RETR");
 					
-					receiveFile(host, data_port, fileName);
+					receiveFile(host, data_port, fileName, username);
 				}
 			}
 		} catch (UnknownHostException e) {
@@ -136,18 +139,24 @@ public class Client {
 		}
 	}
 
-	private static void receiveFile(InetAddress host, int data_port, String fileName) {
+	private static void receiveFile(InetAddress host, int data_port, String fileName, String username) {
 
 		try {
 			Socket dataSocket = new Socket(host, data_port);
+			
+			DataInputStream din = new DataInputStream(dataSocket.getInputStream());
+			DataOutputStream dout = new DataOutputStream(dataSocket.getOutputStream());
+			
 			System.out.println("Connected to " + dataSocket.getRemoteSocketAddress() + " for Data Connection");
 
-			String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + fileName;
-			//String fileName = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/client/sample_inclient.txt";
+			//String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + username + "/" + fileName;
 
-			File f = new File(fileName);
-			DataInputStream din = new DataInputStream(dataSocket.getInputStream());
-
+			String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + username + "/" + fileName;
+			
+			dout.writeUTF(fileName);
+			
+			File f = new File(filePath);
+			
 			FileOutputStream fout = new FileOutputStream(f);
 			int ch;
 			String temp;
@@ -166,5 +175,20 @@ public class Client {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static String createUserDirectory(String username) {
+		String userPath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + username;
+		File file = new File(userPath);
+		if (!file.exists()) {
+			if (file.mkdir()) {
+				System.out.println("User Directory created!");
+			} else {
+				System.out.println("Failed to create directory!");
+			}
+		} else {
+			System.out.println("User Directory exists");
+		}
+		return username;
 	}
 }

@@ -77,15 +77,22 @@ public class DataConnection implements Runnable {
 	}
 
 	private void sendFile() {
+		
 		DataOutputStream dout;
 
+		DataInputStream din;
+		
 		try {
 			dout = new DataOutputStream(req_socket.getOutputStream());
-
-			String filename = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/src/ftp/server/download_server.txt";
-			//String filename = "/home/ec2-user/" + username + 
+			din = new DataInputStream(req_socket.getInputStream());
+			String filename = din.readUTF(); 
+			System.out.println("The file required is " + filename);
+			
+			//String filePath = "D:/SAHANA/Advanced SE/FTP/CSE6324_FTP/" + username + "/" + filename;
+			
+			String filePath = "/home/ec2-user/" + username + "/" + filename;
 					
-			File f = new File(filename);
+			File f = new File(filePath);
 			FileInputStream fin = new FileInputStream(f);
 			
 			//lock.readLock().lock();
